@@ -1,0 +1,37 @@
+name: Release to webstore
+on: 
+  workflow_dispatch:
+
+env:
+  APP_NAME: dewaifu
+  APP_ID: tbd
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: "Create zip file"
+        run: "zip -r ${{ env.APP_NAME }}.zip . -x '.github/*' -x '.git/*'"
+      - name: "Upload Artifact"
+        uses: actions/upload-artifact@v2
+        with:
+          name: "${{ env.APP_NAME }}.zip"
+          path: "${{ env.APP_NAME }}.zip"
+          retention-days: 5
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download extension artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ env.APP_NAME }}
+      - name: Publish to chrome web store
+        uses: trmcnvn/chrome-addon@v2
+        continue-on-error: true
+        with:
+          extension: "${{ env.APP_ID }}"
+          zip: "${{ env.APP_NAME }}"
+          client-id: "${{ secrets.CHROME_CLIENT_ID }}"
+          client-secret: ${{ secrets.CHROME_CLIENT_SECRET }}"
+          refresh-token: "${{ secrets.CHROME_REFRESH_TOKEN }}"
