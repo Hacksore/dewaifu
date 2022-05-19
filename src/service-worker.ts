@@ -79,6 +79,17 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   }
 });
 
+const updateIcon = async () => {
+  // when the work starts set the icon
+  const currentVal = await chrome.storage.local.get(ENABLED_KEY);
+  // update the icon
+  const icon = currentVal[ENABLED_KEY] ? "on" : "off";
+  chrome.action.setIcon({ path: `${icon}.png` });
+
+}
+
+updateIcon();
+
 chrome.action.onClicked.addListener(async tab => {
   if (!tab.url?.includes("youtube.com")) {
     return;
@@ -91,8 +102,8 @@ chrome.action.onClicked.addListener(async tab => {
   await chrome.storage.local.set({ [ENABLED_KEY]: newState });
 
   // update the icon
-  const icon = newState ? "on" : "off";
-  chrome.action.setIcon({ path: `${icon}.png` });
+  updateIcon();
+  
 
   if (!tab.id) return;
   chrome.scripting.executeScript({
