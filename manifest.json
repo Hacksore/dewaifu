@@ -5,6 +5,9 @@
   "background": {
     "service_worker": "src/service-worker.ts"
   },
+  "icons": {
+    "16": "off.png"
+  },
   "permissions": ["activeTab", "scripting", "storage"],
   "host_permissions": [    
     "https://*.youtube.com/*",

@@ -59,6 +59,10 @@ const main = async (enabled: boolean) => {
 };
 
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+  if (!tab.url?.includes("youtube.com")) {
+    return;
+  }
+
   if (changeInfo.status == "loading") {
     const currentState = await chrome.storage.local.get(ENABLED_KEY);
     if (!tabId) return;
@@ -76,6 +80,10 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
 });
 
 chrome.action.onClicked.addListener(async tab => {
+  if (!tab.url?.includes("youtube.com")) {
+    return;
+  }
+
   const currentVal = await chrome.storage.local.get(ENABLED_KEY);
 
   // update the state
