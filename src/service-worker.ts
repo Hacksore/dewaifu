@@ -25,50 +25,53 @@ const main = async (enabled: boolean) => {
 
 `;
 
+  const tagExists = () => {
+    const foundStyleEle = document.getElementById("dewaifu-style");
+    if (foundStyleEle) {
+      return true;
+    }
+
+    return false;
+  }
+
   const addWaifuBlock = () => {
     const styleEle = document.createElement("style");
     styleEle.innerHTML = CUSTOM_CSS;
 
     // use to select later
     styleEle.id = "dewaifu-style";
-
-    console.log(styleEle);
     document.head.appendChild(styleEle);
   };
 
   const removeWaifuBlock = () => {
     // check if we found the style tag and doing nothing if we did
-    const foundStyleEle = document.getElementById("dewaifu-style");
-    if (foundStyleEle) {
-      foundStyleEle.remove();
-    }
+    const foundStyleEle = document.getElementById("dewaifu-style") as HTMLElement;
+    foundStyleEle.remove();
   };
 
-  console.log("Current state", enabled);
   if (enabled) {
-    addWaifuBlock();
+    if (!tagExists()) {
+      addWaifuBlock();
+    }
   } else {
     removeWaifuBlock();
   }
 };
 
-async function getCurrentTab() {
-  const queryOptions = { active: true, currentWindow: true };
-  const [tab] = await chrome.tabs.query(queryOptions);
-  return tab;
-}
+chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+  if (changeInfo.status == "complete") {
+    const currentState = await chrome.storage.local.get(ENABLED_KEY);
+    if (!tabId) return;
 
-(async () => {
-  const tabId = await getCurrentTab();
-  const cur = await chrome.storage.local.get(ENABLED_KEY);
-  if (!tabId) return;
-  chrome.scripting.executeScript({
-    // @ts-ignore
-    target: { tabId: tabId.id },
-    function: main,
-    args: [cur],
-  });
-})();
+    chrome.scripting.executeScript({
+      // @ts-ignore
+      target: { tabId: tabId },
+      // @ts-ignore
+      function: main,
+      args: [currentState[ENABLED_KEY]],
+    });
+  }
+});
 
 chrome.action.onClicked.addListener(async tab => {
   const currentVal = await chrome.storage.local.get(ENABLED_KEY);

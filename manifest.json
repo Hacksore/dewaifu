@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "dewaifu",
+  "version": "1.0.0",
+  "background": {
+    "service_worker": "src/service-worker.ts"
+  },
+  "permissions": ["activeTab", "scripting", "storage"],
+  "host_permissions": [    
+    "https://*.youtube.com/*",
+    "https://youtube.com/*"
+  ],
+  "action": {}
+}
