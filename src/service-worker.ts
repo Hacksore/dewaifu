@@ -59,10 +59,12 @@ const main = async (enabled: boolean) => {
 };
 
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
-  if (changeInfo.status == "complete") {
+  if (changeInfo.status == "loading") {
     const currentState = await chrome.storage.local.get(ENABLED_KEY);
     if (!tabId) return;
 
+    // BUG: we cant seem to do what we did in v2 where we ran at document_start
+    // issue https://bugs.chromium.org/p/chromium/issues/detail?id=1303199
     chrome.scripting.executeScript({
       // @ts-ignore
       target: { tabId: tabId },
