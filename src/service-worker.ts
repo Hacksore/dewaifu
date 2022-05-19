@@ -79,14 +79,18 @@ chrome.action.onClicked.addListener(async tab => {
   const currentVal = await chrome.storage.local.get(ENABLED_KEY);
 
   // update the state
-  const newVal = !currentVal[ENABLED_KEY];
-  await chrome.storage.local.set({ [ENABLED_KEY]: newVal });
+  const newState = !currentVal[ENABLED_KEY];
+  await chrome.storage.local.set({ [ENABLED_KEY]: newState });
+
+  // update the icon
+  const icon = newState ? "on" : "off";
+  chrome.action.setIcon({ path: `${icon}.png` });
 
   if (!tab.id) return;
   chrome.scripting.executeScript({
     target: { tabId: tab.id },
     // @ts-ignore
     function: main,
-    args: [newVal],
+    args: [newState],
   });
 });
